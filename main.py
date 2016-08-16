@@ -41,6 +41,24 @@ class Index(webapp2.RequestHandler):
 
         # TODO 1
         # Include another form so the user can "cross off" a movie from their list.
+        
+        movie_list = ["Pretty Woman", "Independence Day", "The Big Lebowski", "UP", "Chiraq"]
+        movie_element = ['''<option value="{}">{}</option>'''.format(movie, movie) for movie in movie_list]
+        movie_element = " ".join(movie_element)
+    
+        strike_form = """
+        <form action="/crossOff" method="post"
+            <label>
+                I want to cross off
+                <select id="cross-off" name="cross_off">
+                """ + movie_element + """
+                </select>
+                from my watchlist.
+            </label>
+            <input type="submit" value="Cross Off"/>
+        </form>
+        
+        """
 
 
         # TODO 4 (Extra Credit)
@@ -48,7 +66,7 @@ class Index(webapp2.RequestHandler):
         # text box (<input type="text"/>)
 
 
-        response = page_header + edit_header + add_form + page_footer
+        response = page_header + edit_header + add_form + "<br>" + strike_form + page_footer
         self.response.write(response)
 
 
@@ -74,11 +92,24 @@ class AddMovie(webapp2.RequestHandler):
 # handle the request from your 'cross-off' form. The user should see a message like:
 # "Star Wars has been crossed off your watchlist".
 
-
+class CrossOffMovie(webapp2.RequestHandler):
+    """Handles requests coming in to '/crossOff'
+    """
+    
+    def post(self):
+        
+        old_movie = self.request.get_all("cross_off")[0]
+        
+        old_movie_element = "<b><strike>" + old_movie + "</strike></b>"
+        sentence = old_movie_element + " has been crossed of you watchlist!"
+        
+        response = page_header + "<p>" + sentence + "</p>" + page_footer
+        self.response.write(response)
 
 # TODO 3
 # Include a route for your cross-off handler, by adding another tuple to the list below.
 app = webapp2.WSGIApplication([
     ('/', Index),
-    ('/add', AddMovie)
+    ('/add', AddMovie),
+    ('/crossOff', CrossOffMovie)
 ], debug=True)
